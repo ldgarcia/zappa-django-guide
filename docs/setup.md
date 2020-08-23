@@ -8,7 +8,7 @@ While the ultimate goal is to have your Django application hosted in a cloud-bas
 
 * Collect the required packages
 * Build a lambda compatible deployment
-* Upload the deployment 
+* Upload the deployment
 * Coordinate the various AWS services to enable the cloud-based environment
 
 In addition, a working environment assists with development and testing.  The caveat is that this working environment will not match exactly the cloud-based deployment. However, the goal is to get a reasonablly close approximation while still balancing ease of use.
@@ -17,15 +17,15 @@ In addition, a working environment assists with development and testing.  The ca
 
 To ensure baseline expectations are set, all environments will assume the following criteria:
 
-* Python 3.6 or 2.7 (according to [AWS lambda support](http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html)) 
+* Python 3.6 or 2.7 (according to [AWS lambda support](http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html))
 * Django 1.10
 * Latest version of [zappa](https://pypi.python.org/pypi/zappa)
 
-In addition, zappa *requires* a virtual environment in which to function.  So all approaches below include a virtual environment.  
+In addition, zappa *requires* a virtual environment in which to function.  So all approaches below include a virtual environment.
 
 ## Approach #1 - Local Machine
 
-You can easily set up your working environment on your local machine. For simple projects, this is very easy to manage and maintain.  All you need is Python 2.7, pip, and virtualenv installed.  This works for Windows, MacOS, and Linux machines.  
+You can easily set up your working environment on your local machine. For simple projects, this is very easy to manage and maintain.  All you need is Python 2.7, pip, and virtualenv installed.  This works for Windows, MacOS, and Linux machines.
 
 Here we setup a working environment named 'zappatest'
 
@@ -36,10 +36,10 @@ virtualenv ve
 source ve/bin/activate
 pip install django zappa
 ```
-And you are done.  
+And you are done.
 
 !!! Warning
-    While this approach is easy to get up and running, the challenge comes along when you require more advanced python packages.  
+    While this approach is easy to get up and running, the challenge comes along when you require more advanced python packages.
 
     For example, once you start connecting to databases, you will need to compile packages such as 'psycopg2' for PostGresSQL.  You should consider the implications of installing needed libraries on your local machine.
 
@@ -47,9 +47,9 @@ And you are done.
 
 ## Approach #2 - Docker with zappa (recommended)
 
-Sometimes leveraging Docker to create an isolated working environment is a good idea.  It takes more work to setup initially, but once you have the foundations, it is quite easy to create multiple working environments and it is easier to share those same environments with other folks on your team.  
+Sometimes leveraging Docker to create an isolated working environment is a good idea.  It takes more work to setup initially, but once you have the foundations, it is quite easy to create multiple working environments and it is easier to share those same environments with other folks on your team.
 
-The main goal of using Docker is to create an environment that closely matches the AWS lambda environment.  The closer it matches, then there will be less difficult-to-debug problems. 
+The main goal of using Docker is to create an environment that closely matches the AWS lambda environment.  The closer it matches, then there will be less difficult-to-debug problems.
 
 We will leverage the work others have done to enable such an environment.  First and foremost, the folks from [lambci](https://github.com/lambci/lambci) have created github repo called [docker-lambda](https://github.com/lambci/docker-lambda) that accurately reflects the lambda environment.  It provides:
 
@@ -65,7 +65,7 @@ For the purposes of this walkthrough we will focus only on the 'build' image tha
 
 Note that this work was originally inspired from [danielwhatmuff/zappa](https://github.com/danielwhatmuff/zappa) but has been enhanced to illustrate support for Python 3.6
 
-### Inital Setup 
+### Inital Setup
 
 These steps need to be performed once for a new system
 
@@ -99,6 +99,18 @@ alias zappashell3 >> ~/.bash_profile
 alias zappashell3='docker run -ti -e AWS_PROFILE=zappa -v "$(pwd):/var/task" -v ~/.aws/:/root/.aws  --rm lambci/lambda:build-python3.6 bash'
 ```
 
+Alternatively, you can define a function instead of an alias if you need to use multiple environments:
+```sh
+zappashell() {
+    docker run -ti -e AWS_PROFILE=$1 -v "$(pwd):/var/task" -v ~/.aws/:/root/.aws  --rm lambci/lambda:build-python3.6 bash
+}
+```
+
+Then, you can use it like:
+```sh
+zappashell <profile-name>
+```
+
 ### Taking a test drive
 
 So let's try this out now.  Examples going forward will focus on Python 3.6.  To fire up the docker container use:
@@ -106,14 +118,14 @@ So let's try this out now.  Examples going forward will focus on Python 3.6.  To
 ```sh
 $ cd /your_zappa_project
 $ zappashell3
-bash-4.2# 
+bash-4.2#
 ```
 
 Next, create the *required* virtual environment, activate it, and install needed dependencies
 
 ```sh
 bash-4.2# virtualenv ve
-bash-4.2# source ve/bin/activate 
+bash-4.2# source ve/bin/activate
 (ve) bash-4.2# pip install -r requirements.txt
 ```
 
@@ -160,7 +172,7 @@ $ cd /your_zappa_project
 $ docker build -t myzappa .
 ```
 
-This will create a local Docker image on your system. 
+This will create a local Docker image on your system.
 
 #### Update your zappashell alias
 
@@ -177,7 +189,7 @@ Create the *required* virtual environment, activate it, and install needed depen
 ```sh
 $ zappashell
 zappashell> python -m venv ve
-zappashell> source ve/bin/activate 
+zappashell> source ve/bin/activate
 (ve) zappa> pip install -r requirements.txt
 ```
 
@@ -191,7 +203,7 @@ Each time you are working on your project, merely fire up the container:
 $ cd /your_zappa_project
 $ zappashell
 zappashell> source ve/bin/activate
-(ve) zappashell> 
+(ve) zappashell>
 ```
 
 All zappa commands can be used to deploy your project:
